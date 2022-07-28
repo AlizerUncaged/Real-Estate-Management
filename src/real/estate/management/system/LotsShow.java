@@ -1,0 +1,295 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
+ */
+package real.estate.management.system;
+
+import java.awt.Toolkit;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import javax.swing.JOptionPane;
+import javax.swing.JTable;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
+
+/**
+ *
+ * @author floyd
+ */
+public class LotsShow extends javax.swing.JDialog {
+
+    private double areaThreshold;
+    private double priceThreshold;
+    private double priceMaximum;
+    private int blockNumber;
+
+    public LotsShow() {
+
+        areaThreshold = 0;
+        priceThreshold = 0;
+        priceMaximum = Double.MAX_VALUE;
+        blockNumber = -1;
+
+        initComponents();
+
+        populateTable();
+
+        var _path = System.getProperty("user.home") + "\\Desktop\\report.csv";
+        exportToCSV(estateTable, _path);
+
+        JOptionPane.showMessageDialog(
+                this,
+                "Report exported! At: " + _path,
+                "Success",
+                JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    public static boolean exportToCSV(JTable tableToExport,
+            String pathToExportTo) {
+
+        try {
+
+            TableModel model = tableToExport.getModel();
+            FileWriter csv = new FileWriter(new File(pathToExportTo));
+
+            for (int i = 0; i < model.getColumnCount(); i++) {
+                csv.write(model.getColumnName(i) + ",");
+            }
+
+            csv.write("\n");
+
+            for (int i = 0; i < model.getRowCount(); i++) {
+                for (int j = 0; j < model.getColumnCount(); j++) {
+                    csv.write(model.getValueAt(i, j).toString() + ",");
+                }
+                csv.write("\n");
+            }
+
+            csv.close();
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    /**
+     * Creates new form LotsShow
+     */
+    public LotsShow(double areaThreshold, double priceThreshold, double priceMaximum, int blockNumber) {
+        initComponents();
+
+        this.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("icon.png")));
+
+        this.areaThreshold = areaThreshold;
+        this.priceThreshold = priceThreshold;
+        this.priceMaximum = priceMaximum;
+        this.blockNumber = blockNumber;
+
+        if (blockNumber <= -1) {
+            this.setTitle("All Lots");
+        }
+
+        populateTable();
+
+        estateTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            public void valueChanged(ListSelectionEvent event) {
+                var blockNumber = estateTable
+                        .getValueAt(estateTable.getSelectedRow(), 0);
+                var lotNumber = estateTable
+                        .getValueAt(estateTable.getSelectedRow(), 1);
+                var lotAvailability = estateTable
+                        .getValueAt(estateTable.getSelectedRow(), 4);
+
+                if (!lotAvailability.toString().equalsIgnoreCase("available")) {
+                    lotData.setText("Not available.");
+                    return;
+                }
+                lotData.setText("Block " + blockNumber.toString() + " Lot " + lotNumber.toString());
+
+            }
+        });
+    }
+
+    public void populateTable() {
+
+        DefaultTableModel tableModel
+                = (DefaultTableModel) estateTable
+                        .getModel();
+
+        tableModel.setRowCount(0);
+
+        var blocks = EstateArea.instance.getBlocks();
+
+        for (var block : blocks) {
+            if (blockNumber >= 0) {
+                if (blockNumber != block.getId()) {
+                    continue;
+                }
+            }
+
+            for (var lot : block.getLots()) {
+
+                if (lot.getArea() < this.areaThreshold) {
+                    continue;
+                }
+
+                if (lot.getPrice() < this.priceThreshold) {
+                    continue;
+                }
+
+                if (lot.getPrice() > this.priceMaximum) {
+                    continue;
+                }
+
+                tableModel.addRow(new Object[]{
+                    block.getId(), lot.getId(),
+                    Double.toString(lot.getArea()) + "ft^2",
+                    "₱" + Double.toString(lot.getPrice()),
+                    lot.getStatus().name()
+                });
+            }
+        }
+    }
+
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+
+        jScrollPane1 = new javax.swing.JScrollPane();
+        estateTable = new javax.swing.JTable();
+        jButton1 = new javax.swing.JButton();
+        lotData = new javax.swing.JLabel();
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setTitle("Lots Search");
+        setMinimumSize(new java.awt.Dimension(400, 300));
+        setResizable(false);
+
+        estateTable.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null}
+            },
+            new String [] {
+                "Block Number", "Lot Number", "Lot Area", "Lot Price", "Status"
+            }
+        ));
+        jScrollPane1.setViewportView(estateTable);
+
+        jButton1.setText("Buy Lot");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                lotBuying(evt);
+            }
+        });
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addGap(22, 22, 22)
+                .addComponent(lotData, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 81, Short.MAX_VALUE)
+                .addComponent(jButton1)
+                .addGap(25, 25, 25))
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jButton1)
+                    .addComponent(lotData))
+                .addGap(0, 17, Short.MAX_VALUE))
+        );
+
+        pack();
+    }// </editor-fold>//GEN-END:initComponents
+
+    private void lotBuying(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_lotBuying
+        var blockNumber = estateTable
+                .getValueAt(estateTable.getSelectedRow(), 0);
+        var lotNumber = estateTable
+                .getValueAt(estateTable.getSelectedRow(), 1);
+        var lotAvailability = estateTable
+                .getValueAt(estateTable.getSelectedRow(), 4);
+
+        if (!lotAvailability.toString().equalsIgnoreCase("available")) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Lot is not available.",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        var blocks = EstateArea.instance.getBlocks();
+
+        for (var block : blocks) {
+            for (var lot : block.getLots()) {
+                if (block.getId() == Integer.parseInt(blockNumber.toString())
+                        && lot.getId() == Integer.parseInt(lotNumber.toString())) {
+                    lot.buy(lot.getPrice());
+
+                    JOptionPane.showMessageDialog(
+                            this,
+                            "Lot bought!",
+                            "Success",
+                            JOptionPane.INFORMATION_MESSAGE);
+                    this.dispose();
+                }
+            }
+        }
+    }//GEN-LAST:event_lotBuying
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String args[]) {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(LotsShow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(LotsShow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(LotsShow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(LotsShow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
+
+        /* Create and display the form */
+    }
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JTable estateTable;
+    private javax.swing.JButton jButton1;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JLabel lotData;
+    // End of variables declaration//GEN-END:variables
+}

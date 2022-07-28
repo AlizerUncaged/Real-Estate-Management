@@ -34,13 +34,13 @@ public class EstateArea {
         // Create blocks.
         for (int i = 0; i < maxBlocks; i++) {
             
-            var block = new Block(i + 1);
+            Block block = new Block(i + 1);
             
             for (int j = 0; j < lotsPerBlock; j++) {
                 
                 // Lots have random areas between 
                 // 1000 ft^2 and 9000 ft^2.
-                var lotArea = rand.nextInt(1000, 9000);
+                int lotArea = rand.nextInt(1000, 9000);
                 block.addLot(new Lot(j + 1, lotArea));
                 
             }

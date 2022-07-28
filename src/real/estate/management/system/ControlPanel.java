@@ -184,7 +184,7 @@ public class ControlPanel extends javax.swing.JDialog {
 
     private void showAllLots(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_showAllLots
 
-        if (customerName.getText().isBlank()) {
+        if (customerName.getText().equals("")) {
             JOptionPane.showMessageDialog(
                     this,
                     "Please put your full name.",
@@ -200,7 +200,7 @@ public class ControlPanel extends javax.swing.JDialog {
 
     private void findLots(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_findLots
 
-        if (customerName.getText().isBlank()) {
+        if (customerName.getText().equals("")) {
             JOptionPane.showMessageDialog(
                     this,
                     "Please put your full name.",

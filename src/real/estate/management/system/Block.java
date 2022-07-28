@@ -22,7 +22,7 @@ public class Block extends BlockBase {
     
     @Override
     public Lot[] getLots(){
-        return lots.toArray(Lot[]::new);
+        return lots.toArray(new Lot[0]);
     }
     
     public void addLot(Lot lot) {

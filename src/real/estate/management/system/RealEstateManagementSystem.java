@@ -16,7 +16,7 @@ public class RealEstateManagementSystem {
      */
     public static void main(String[] args) {
         // TODO code application logic here
-        var control = new ControlPanel();
+        ControlPanel control = new ControlPanel();
         control.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
         control.setVisible(true);
     }

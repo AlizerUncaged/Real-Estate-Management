@@ -37,7 +37,7 @@ public class LotsShow extends javax.swing.JDialog {
 
         populateTable();
 
-        var _path = System.getProperty("user.home") + "\\Desktop\\report.csv";
+        String _path = System.getProperty("user.home") + "\\Desktop\\report.csv";
         exportToCSV(estateTable, _path);
 
         JOptionPane.showMessageDialog(
@@ -97,11 +97,11 @@ public class LotsShow extends javax.swing.JDialog {
 
         estateTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent event) {
-                var blockNumber = estateTable
+                Object blockNumber = estateTable
                         .getValueAt(estateTable.getSelectedRow(), 0);
-                var lotNumber = estateTable
+                Object lotNumber = estateTable
                         .getValueAt(estateTable.getSelectedRow(), 1);
-                var lotAvailability = estateTable
+                Object lotAvailability = estateTable
                         .getValueAt(estateTable.getSelectedRow(), 4);
 
                 if (!lotAvailability.toString().equalsIgnoreCase("available")) {
@@ -122,16 +122,16 @@ public class LotsShow extends javax.swing.JDialog {
 
         tableModel.setRowCount(0);
 
-        var blocks = EstateArea.instance.getBlocks();
+        Block[] blocks = EstateArea.instance.getBlocks();
 
-        for (var block : blocks) {
+        for (Block block : blocks) {
             if (blockNumber >= 0) {
                 if (blockNumber != block.getId()) {
                     continue;
                 }
             }
 
-            for (var lot : block.getLots()) {
+            for (Lot lot : block.getLots()) {
 
                 if (lot.getArea() < this.areaThreshold) {
                     continue;
@@ -221,11 +221,11 @@ public class LotsShow extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void lotBuying(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_lotBuying
-        var blockNumber = estateTable
+        Object blockNumber = estateTable
                 .getValueAt(estateTable.getSelectedRow(), 0);
-        var lotNumber = estateTable
+        Object lotNumber = estateTable
                 .getValueAt(estateTable.getSelectedRow(), 1);
-        var lotAvailability = estateTable
+        Object lotAvailability = estateTable
                 .getValueAt(estateTable.getSelectedRow(), 4);
 
         if (!lotAvailability.toString().equalsIgnoreCase("available")) {
@@ -237,10 +237,10 @@ public class LotsShow extends javax.swing.JDialog {
             return;
         }
 
-        var blocks = EstateArea.instance.getBlocks();
+        Block[] blocks = EstateArea.instance.getBlocks();
 
-        for (var block : blocks) {
-            for (var lot : block.getLots()) {
+        for (Block block : blocks) {
+            for (Lot lot : block.getLots()) {
                 if (block.getId() == Integer.parseInt(blockNumber.toString())
                         && lot.getId() == Integer.parseInt(lotNumber.toString())) {
                     lot.buy(lot.getPrice());

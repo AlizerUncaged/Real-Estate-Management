@@ -53,6 +53,6 @@ public class EstateArea {
             = new ArrayList<>();
     
     public Block[] getBlocks() {
-        return blocks.toArray(Block[]::new);
+        return blocks.toArray(new Block[0]);
     }
 }

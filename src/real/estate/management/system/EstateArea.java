@@ -40,7 +40,7 @@ public class EstateArea {
                 
                 // Lots have random areas between 
                 // 1000 ft^2 and 9000 ft^2.
-                int lotArea = rand.nextInt(1000, 9000);
+                int lotArea = rand.nextInt(8000) + 1000;
                 block.addLot(new Lot(j + 1, lotArea));
                 
             }

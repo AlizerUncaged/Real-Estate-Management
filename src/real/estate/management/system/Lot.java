@@ -33,14 +33,36 @@ public class Lot implements EstateObject {
         return lotStatus;
     }
     
-    public boolean buy(double budget){
+    
+    
+    public boolean buy(double budget, String owner){
         if (this.lotStatus == LotStatus.Sold) 
             return false;
+        
+        if (owner != "")
+        {
+            if (owner != owner)
+                return false;
+        }
         
         this.lotStatus = budget >= getPrice() ? 
                 LotStatus.Sold : this.lotStatus;
         
         return budget >= getPrice();
+    }
+    
+    private String owner = "";
+    
+    public boolean reserve(String owner){
+        if (this.lotStatus == LotStatus.Sold) 
+            return false;
+        
+        this.owner = owner;
+        
+        this.lotStatus = 
+                LotStatus.Reserved ;
+        
+        return true;
     }
     
     public double getPrice() {

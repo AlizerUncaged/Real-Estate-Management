@@ -10,5 +10,6 @@ package real.estate.management.system;
  */
 public enum LotStatus {
     Available,
-    Sold
+    Sold,
+    Reserved
 }

@@ -21,6 +21,8 @@ import javax.swing.table.TableModel;
  */
 public class LotsShow extends javax.swing.JDialog {
 
+    private String owner;
+
     private double areaThreshold;
     private double priceThreshold;
     private double priceMaximum;
@@ -79,11 +81,12 @@ public class LotsShow extends javax.swing.JDialog {
     /**
      * Creates new form LotsShow
      */
-    public LotsShow(double areaThreshold, double priceThreshold, double priceMaximum, int blockNumber) {
+    public LotsShow(String owner, double areaThreshold, double priceThreshold, double priceMaximum, int blockNumber) {
         initComponents();
 
         this.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("icon.png")));
 
+        this.owner = owner;
         this.areaThreshold = areaThreshold;
         this.priceThreshold = priceThreshold;
         this.priceMaximum = priceMaximum;
@@ -168,6 +171,7 @@ public class LotsShow extends javax.swing.JDialog {
         estateTable = new javax.swing.JTable();
         jButton1 = new javax.swing.JButton();
         lotData = new javax.swing.JLabel();
+        jButton2 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Lots Search");
@@ -194,6 +198,13 @@ public class LotsShow extends javax.swing.JDialog {
             }
         });
 
+        jButton2.setText("Reserve Lot");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                lotReserve(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -202,7 +213,9 @@ public class LotsShow extends javax.swing.JDialog {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addGap(22, 22, 22)
                 .addComponent(lotData, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 81, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jButton2)
+                .addGap(18, 18, 18)
                 .addComponent(jButton1)
                 .addGap(25, 25, 25))
         );
@@ -213,7 +226,8 @@ public class LotsShow extends javax.swing.JDialog {
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButton1)
-                    .addComponent(lotData))
+                    .addComponent(lotData)
+                    .addComponent(jButton2))
                 .addGap(0, 17, Short.MAX_VALUE))
         );
 
@@ -227,14 +241,16 @@ public class LotsShow extends javax.swing.JDialog {
                 .getValueAt(estateTable.getSelectedRow(), 1);
         Object lotAvailability = estateTable
                 .getValueAt(estateTable.getSelectedRow(), 4);
-
-        if (!lotAvailability.toString().equalsIgnoreCase("available")) {
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Lot is not available.",
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
-            return;
+        
+        if (!lotAvailability.toString().equalsIgnoreCase("reserved")) {
+            if (!lotAvailability.toString().equalsIgnoreCase("available")) {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Lot is not available.",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+                return;
+            }
         }
 
         Block[] blocks = EstateArea.instance.getBlocks();
@@ -243,7 +259,15 @@ public class LotsShow extends javax.swing.JDialog {
             for (Lot lot : block.getLots()) {
                 if (block.getId() == Integer.parseInt(blockNumber.toString())
                         && lot.getId() == Integer.parseInt(lotNumber.toString())) {
-                    lot.buy(lot.getPrice());
+
+                    if (!lot.buy(lot.getPrice(), this.owner)) {
+                        JOptionPane.showMessageDialog(
+                                this,
+                                "Failed buying, is this lot reserved to you?",
+                                "Error",
+                                JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
 
                     JOptionPane.showMessageDialog(
                             this,
@@ -255,6 +279,51 @@ public class LotsShow extends javax.swing.JDialog {
             }
         }
     }//GEN-LAST:event_lotBuying
+
+    private void lotReserve(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_lotReserve
+        Object blockNumber = estateTable
+                .getValueAt(estateTable.getSelectedRow(), 0);
+        Object lotNumber = estateTable
+                .getValueAt(estateTable.getSelectedRow(), 1);
+        Object lotAvailability = estateTable
+                .getValueAt(estateTable.getSelectedRow(), 4);
+
+        if (!lotAvailability.toString().equalsIgnoreCase("reserved")) {
+            if (!lotAvailability.toString().equalsIgnoreCase("available")) {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Lot is not available.",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+        }
+
+        Block[] blocks = EstateArea.instance.getBlocks();
+
+        for (Block block : blocks) {
+            for (Lot lot : block.getLots()) {
+                if (block.getId() == Integer.parseInt(blockNumber.toString())
+                        && lot.getId() == Integer.parseInt(lotNumber.toString())) {
+
+                    if (!lot.reserve(this.owner)) {
+                        JOptionPane.showMessageDialog(
+                                this,
+                                "Failed buying, is this lot reserved to you?",
+                                "Error",
+                                JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+                    JOptionPane.showMessageDialog(
+                            this,
+                            "Lot reserved!",
+                            "Success",
+                            JOptionPane.INFORMATION_MESSAGE);
+                    this.dispose();
+                }
+            }
+        }
+    }//GEN-LAST:event_lotReserve
 
     /**
      * @param args the command line arguments
@@ -289,6 +358,7 @@ public class LotsShow extends javax.swing.JDialog {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTable estateTable;
     private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lotData;
     // End of variables declaration//GEN-END:variables

@@ -193,7 +193,7 @@ public class ControlPanel extends javax.swing.JDialog {
             return;
         }
 
-        LotsShow lotsShow = new LotsShow(0, 0, Double.MAX_VALUE, -1);
+        LotsShow lotsShow = new LotsShow(customerName.getText(), 0, 0, Double.MAX_VALUE, -1);
         lotsShow.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
         lotsShow.setVisible(true);
     }//GEN-LAST:event_showAllLots
@@ -235,7 +235,7 @@ public class ControlPanel extends javax.swing.JDialog {
         }
 
 
-        LotsShow lotsShow = new LotsShow(areaMinimum, _minBudget, _maxBudget, blockNumber);
+        LotsShow lotsShow = new LotsShow(customerName.getText(), areaMinimum, _minBudget, _maxBudget, blockNumber);
         lotsShow.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
         lotsShow.setVisible(true);
     }//GEN-LAST:event_findLots
